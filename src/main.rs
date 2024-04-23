@@ -4,7 +4,10 @@ use twilight_cache_inmemory::{InMemoryCache, InMemoryCacheBuilder, ResourceType}
 use twilight_gateway::{EventTypeFlags, Intents, Shard, ShardId, StreamExt};
 use twilight_http::Client;
 use twilight_model::{
-    gateway::{event::Event, payload::outgoing::request_guild_members::RequestGuildMembersBuilder},
+    gateway::{
+        event::Event, payload::outgoing::request_guild_members::RequestGuildMembersBuilder,
+        CloseFrame,
+    },
     guild::{Permissions, Role},
     id::{
         marker::{GuildMarker, RoleMarker, UserMarker},
@@ -22,6 +25,11 @@ async fn main() {
     let token = valk_utils::get_var("DISCORD_TOKEN");
     let intents = Intents::GUILD_MEMBERS | Intents::GUILDS;
     let resource_types = ResourceType::MEMBER | ResourceType::ROLE;
+    let event_types = EventTypeFlags::MEMBER_UPDATE
+        | EventTypeFlags::MEMBER_ADD
+        | EventTypeFlags::MEMBER_REMOVE
+        | EventTypeFlags::MEMBER_CHUNK
+        | EventTypeFlags::GUILDS;
     let cache = InMemoryCacheBuilder::new()
         .resource_types(resource_types)
         .build();
@@ -43,19 +51,14 @@ async fn main() {
 
     let mut shard = Shard::new(ShardId::ONE, token, intents);
     let sender = shard.sender();
+    let shutdown_sender = shard.sender();
+    tokio::spawn(async move {
+        vss::shutdown_signal().await;
+        shutdown_sender.close(CloseFrame::NORMAL).ok();
+    });
     tracing::info!("created shard");
 
-    while let Some(item) = shard
-        .next_event(
-            EventTypeFlags::MEMBER_UPDATE
-                | EventTypeFlags::MEMBER_ADD
-                | EventTypeFlags::MEMBER_REMOVE
-                | EventTypeFlags::GUILD_CREATE
-                | EventTypeFlags::GUILD_UPDATE
-                | EventTypeFlags::MEMBER_CHUNK,
-        )
-        .await
-    {
+    while let Some(item) = shard.next_event(event_types).await {
         let Ok(event) = item else {
             tracing::warn!(source = ?item.unwrap_err(), "error receiving event");
             continue;
