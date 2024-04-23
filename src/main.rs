@@ -77,16 +77,8 @@ async fn main() {
                 handle_user(&mut state, mu.guild_id, mu.user.id, &mu.roles).await
             }
             Event::MemberChunk(mc) => {
-                if can_kick(&state, mc.guild_id) {
-                    for member in mc.members {
-                        unsafe_kick_if_kickable(
-                            &mut state,
-                            mc.guild_id,
-                            member.user.id,
-                            &member.roles,
-                        )
-                        .await
-                    }
+                for member in mc.members {
+                    handle_user(&mut state, mc.guild_id, member.user.id, &member.roles).await
                 }
             }
             _event => {}
@@ -110,7 +102,7 @@ async fn handle_user(
     user: Id<UserMarker>,
     roles: &[Id<RoleMarker>],
 ) {
-    if !can_kick(state, guild) {
+    if !can_kick(state, guild, user) {
         return;
     }
     unsafe_kick_if_kickable(state, guild, user, roles).await;
@@ -127,7 +119,15 @@ async fn unsafe_kick_if_kickable(
     }
 }
 
-fn can_kick(state: &AppState, guild: Id<GuildMarker>) -> bool {
+fn can_kick(state: &AppState, guild: Id<GuildMarker>, user: Id<UserMarker>) -> bool {
+    if max_position(state, guild, user) >= max_position(state, guild, state.me) {
+        warn!(
+            guild = guild.get(),
+            user = user.get(),
+            "user has role above me in guild"
+        );
+        return false;
+    }
     if !state
         .cache
         .permissions()
@@ -139,6 +139,14 @@ fn can_kick(state: &AppState, guild: Id<GuildMarker>) -> bool {
     } else {
         true
     }
+}
+
+fn max_position(state: &AppState, guild: Id<GuildMarker>, user: Id<UserMarker>) -> i64 {
+    state
+        .cache
+        .member_highest_role(guild, user)
+        .and_then(|v| state.cache.role(v))
+        .map_or(-1, |v| v.position)
 }
 
 async fn kick_user(
