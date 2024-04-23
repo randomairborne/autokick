@@ -1,11 +1,11 @@
 [package]
-name = "no-you-cant-have-that-role"
+name = "autokick"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+twilight-cache-inmemory = { version = "0.16.0-rc.1", features = ["permission-calculator"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 twilight-gateway = "0.16.0-rc.1"
@@ -13,4 +13,3 @@ twilight-model = "0.16.0-rc.1"
 twilight-http = "0.16.0-rc.1"
 valk-utils = "0.1"
 tracing = "0.1"
-twilight-cache-inmemory = { version = "0.16.0-rc.1", features = ["permission-calculator"] }
