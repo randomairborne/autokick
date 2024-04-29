@@ -1,0 +1,7 @@
+version: "3.9"
+services:
+  minecraft:
+    image: ghcr.io/randomairborne/autokick:latest
+    environment:
+      RUST_LOG: autokick=info
+      # DISCORD_TOKEN: "<your token here>"

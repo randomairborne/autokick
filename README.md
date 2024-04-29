@@ -9,7 +9,15 @@ This can provide an effective way to combat some types of selfbots, which simply
 choose the first option in onboarding, so you can have choosing the first option
 assign a role with `kick me` in the name and boom, kick them.
 
-## Example setup
+## Configuration
+
+```shell
+curl -O https://raw.githubusercontent.com/randomairborne/autokick/main/compose.yaml 
+nano compose.yaml # fill in your Discord bot's token, and uncomment the DISCORD_TOKEN field
+docker compose up -d
+```
+
+## Example Discord Onboarding Setup
 
 ![Don't Pick It in onboarding!](.github/img/DontPick.png)
 ![Onboarding Dash!](.github/img/Onboarding.png)
