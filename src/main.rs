@@ -70,18 +70,16 @@ async fn main() {
             Event::GuildCreate(gc) => {
                 let req = RequestGuildMembersBuilder::new(gc.id).query("", None);
                 sender.command(&req).ok();
-                kickable_roles(&mut state, &gc.roles)
+                kickable_roles(&mut state, &gc.roles);
             }
             Event::GuildUpdate(gu) => kickable_roles(&mut state, &gu.roles),
-            Event::MemberAdd(ma) => {
-                handle_user(&mut state, ma.guild_id, ma.user.id, &ma.roles).await
-            }
+            Event::MemberAdd(ma) => handle_user(&state, ma.guild_id, ma.user.id, &ma.roles).await,
             Event::MemberUpdate(mu) => {
-                handle_user(&mut state, mu.guild_id, mu.user.id, &mu.roles).await
+                handle_user(&state, mu.guild_id, mu.user.id, &mu.roles).await;
             }
             Event::MemberChunk(mc) => {
                 for member in mc.members {
-                    handle_user(&mut state, mc.guild_id, member.user.id, &member.roles).await
+                    handle_user(&state, mc.guild_id, member.user.id, &member.roles).await;
                 }
             }
             _event => {}
@@ -100,7 +98,7 @@ fn kickable_roles(state: &mut AppState, roles: &[Role]) {
 }
 
 async fn handle_user(
-    state: &mut AppState,
+    state: &AppState,
     guild: Id<GuildMarker>,
     user: Id<UserMarker>,
     roles: &[Id<RoleMarker>],
@@ -112,7 +110,7 @@ async fn handle_user(
 }
 
 async fn unsafe_kick_if_kickable(
-    state: &mut AppState,
+    state: &AppState,
     guild: Id<GuildMarker>,
     user: Id<UserMarker>,
     roles: &[Id<RoleMarker>],
@@ -131,17 +129,15 @@ fn can_kick(state: &AppState, guild: Id<GuildMarker>, user: Id<UserMarker>) -> b
         );
         return false;
     }
-    if !state
+    let can = state
         .cache
         .permissions()
         .root(state.me, guild)
-        .is_ok_and(|v| v.contains(Permissions::KICK_MEMBERS))
-    {
+        .is_ok_and(|v| v.contains(Permissions::KICK_MEMBERS));
+    if !can {
         warn!(guild = guild.get(), "no kick permissions in guild");
-        false
-    } else {
-        true
     }
+    can
 }
 
 fn max_position(state: &AppState, guild: Id<GuildMarker>, user: Id<UserMarker>) -> i64 {
