@@ -8,7 +8,7 @@ edition = "2021"
 twilight-cache-inmemory = { version = "0.16.0-rc.1", features = ["permission-calculator"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-twilight-gateway = "0.16.0-rc.1"
+twilight-gateway = "0.16.0"
 twilight-model = "0.16.0-rc.1"
 twilight-http = "0.16.0-rc.1"
 valk-utils = "0.1"
