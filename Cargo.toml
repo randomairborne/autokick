@@ -5,7 +5,7 @@ edition = "2021"
 
 
 [dependencies]
-twilight-cache-inmemory = { version = "0.16.0-rc.1", features = ["permission-calculator"] }
+twilight-cache-inmemory = { version = "0.16.0", features = ["permission-calculator"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 twilight-gateway = "0.16.0-rc.1"
