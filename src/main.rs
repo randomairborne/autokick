@@ -5,7 +5,10 @@ use twilight_gateway::{EventTypeFlags, Intents, Shard, ShardId, StreamExt};
 use twilight_http::Client;
 use twilight_model::{
     gateway::{
-        event::Event, payload::{incoming::GuildCreate, outgoing::request_guild_members::RequestGuildMembersBuilder},
+        event::Event,
+        payload::{
+            incoming::GuildCreate, outgoing::request_guild_members::RequestGuildMembersBuilder,
+        },
         CloseFrame,
     },
     guild::{Permissions, Role},
