@@ -5,7 +5,7 @@ use twilight_gateway::{EventTypeFlags, Intents, Shard, ShardId, StreamExt};
 use twilight_http::Client;
 use twilight_model::{
     gateway::{
-        event::Event, payload::outgoing::request_guild_members::RequestGuildMembersBuilder,
+        event::Event, payload::{incoming::GuildCreate, outgoing::request_guild_members::RequestGuildMembersBuilder},
         CloseFrame,
     },
     guild::{Permissions, Role},
@@ -68,9 +68,11 @@ async fn main() {
         state.cache.update(&event);
         match event {
             Event::GuildCreate(gc) => {
-                let req = RequestGuildMembersBuilder::new(gc.id).query("", None);
-                sender.command(&req).ok();
-                kickable_roles(&mut state, &gc.roles);
+                if let GuildCreate::Available(gc) = *gc {
+                    let req = RequestGuildMembersBuilder::new(gc.id).query("", None);
+                    sender.command(&req).ok();
+                    kickable_roles(&mut state, &gc.roles);
+                }
             }
             Event::GuildUpdate(gu) => kickable_roles(&mut state, &gu.roles),
             Event::MemberAdd(ma) => handle_user(&state, ma.guild_id, ma.user.id, &ma.roles).await,
