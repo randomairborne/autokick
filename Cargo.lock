@@ -54,7 +54,7 @@ dependencies = [
  "twilight-cache-inmemory",
  "twilight-gateway",
  "twilight-http",
- "twilight-model",
+ "twilight-model 0.16.0",
  "valk-utils",
  "vss",
 ]
@@ -1146,14 +1146,14 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
 name = "twilight-cache-inmemory"
-version = "0.16.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc9de5f02fa89a48d3fa989811d67a3f3cc3179a46ce71089afa5412ff21fb41"
+checksum = "e30c60181c900c1121000fbd769c547ec437bb3fe61c8f8cdb0f4356b6afbd48"
 dependencies = [
  "bitflags",
  "dashmap",
  "serde",
- "twilight-model",
+ "twilight-model 0.17.0",
  "twilight-util",
 ]
 
@@ -1175,7 +1175,7 @@ dependencies = [
  "tracing",
  "twilight-gateway-queue",
  "twilight-http",
- "twilight-model",
+ "twilight-model 0.16.0",
 ]
 
 [[package]]
@@ -1208,7 +1208,7 @@ dependencies = [
  "tokio",
  "tracing",
  "twilight-http-ratelimiting",
- "twilight-model",
+ "twilight-model 0.16.0",
  "twilight-validate",
 ]
 
@@ -1236,12 +1236,25 @@ dependencies = [
 ]
 
 [[package]]
-name = "twilight-util"
-version = "0.16.0"
+name = "twilight-model"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5777d71286611c1639021f5f6e6b40300eb8da278449ac1cf6da01c94053425"
+checksum = "416247a86048c1909954c95c64ca4c7fbbcb44c36e9cbed8c008e7e40988f610"
 dependencies = [
- "twilight-model",
+ "bitflags",
+ "serde",
+ "serde-value",
+ "serde_repr",
+ "time",
+]
+
+[[package]]
+name = "twilight-util"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e71de79d48ce27aba1f591b10c84677f1317489c2ea154d9b8ed01efa8bceb53"
+dependencies = [
+ "twilight-model 0.17.0",
 ]
 
 [[package]]
@@ -1250,7 +1263,7 @@ version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "49f8d106028ede53708526364b03318bbf846babe146e3ff9e39821a0ca25ff4"
 dependencies = [
- "twilight-model",
+ "twilight-model 0.16.0",
 ]
 
 [[package]]
