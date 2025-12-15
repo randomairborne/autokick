@@ -1,7 +1,7 @@
-version: "3.9"
 services:
-  minecraft:
+  autokick:
+    restart: unless-stopped
     image: ghcr.io/randomairborne/autokick:latest
     environment:
       RUST_LOG: autokick=info
-      # DISCORD_TOKEN: "<your token here>"
+      DISCORD_TOKEN: "<your bot token here>"
