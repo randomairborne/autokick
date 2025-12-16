@@ -1,4 +1,4 @@
-use std::{collections::HashSet, future::IntoFuture, sync::Arc};
+use std::{collections::HashSet, future::IntoFuture, sync::{Arc, atomic::{AtomicBool, Ordering}}};
 
 use twilight_cache_inmemory::{InMemoryCache, InMemoryCacheBuilder, ResourceType};
 use twilight_gateway::{EventTypeFlags, Intents, Shard, ShardId, StreamExt};
@@ -53,15 +53,21 @@ async fn main() {
     };
 
     let mut shard = Shard::new(ShardId::ONE, token, intents);
+    let shutdown_time = Arc::new(AtomicBool::new(false));
+    let shutdown_time_2 = shutdown_time.clone();
     let sender = shard.sender();
     let shutdown_sender = shard.sender();
     tokio::spawn(async move {
         vss::shutdown_signal().await;
+        shutdown_time_2.store(true, Ordering::SeqCst);
         shutdown_sender.close(CloseFrame::NORMAL).ok();
     });
     tracing::info!("created shard");
 
     while let Some(item) = shard.next_event(event_types).await {
+        if shutdown_time.load(Ordering::SeqCst) {
+            break;
+        }
         let Ok(event) = item else {
             tracing::warn!(source = ?item.unwrap_err(), "error receiving event");
             continue;
