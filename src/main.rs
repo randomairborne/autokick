@@ -16,7 +16,7 @@ use twilight_model::{
         payload::{
             incoming::GuildCreate, outgoing::request_guild_members::RequestGuildMembersBuilder,
         },
-        CloseFrame,
+        CloseCode, CloseFrame,
     },
     guild::{Permissions, Role},
     id::{
@@ -106,8 +106,15 @@ async fn main() {
                 }
             }
             Event::GatewayClose(Some(gcf)) => {
-                if (4000..5000).contains(&gcf.code) {
-                    error!(reason = gcf.reason.as_ref(), "Client error in gateway loop");
+                if CloseCode::try_from(gcf.code)
+                    .ok()
+                    .is_some_and(|v| !v.can_reconnect())
+                {
+                    error!(
+                        reason = gcf.reason.as_ref(),
+                        code = gcf.code,
+                        "Client error in gateway loop"
+                    );
                 }
             }
             _event => {}
