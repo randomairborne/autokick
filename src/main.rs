@@ -1,4 +1,11 @@
-use std::{collections::HashSet, future::IntoFuture, sync::{Arc, atomic::{AtomicBool, Ordering}}};
+use std::{
+    collections::HashSet,
+    future::IntoFuture,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
+};
 
 use twilight_cache_inmemory::{InMemoryCache, InMemoryCacheBuilder, ResourceType};
 use twilight_gateway::{EventTypeFlags, Intents, Shard, ShardId, StreamExt};
