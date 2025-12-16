@@ -65,14 +65,19 @@ async fn main() {
     let sender = shard.sender();
     let shutdown_sender = shard.sender();
     tokio::spawn(async move {
+        tracing::info!("Awaiting shutdown signal");
         vss::shutdown_signal().await;
+        tracing::info!("Got shutdown signal");
         shutdown_time_2.store(true, Ordering::SeqCst);
+        tracing::info!("Stopped event loop");
         shutdown_sender.close(CloseFrame::NORMAL).ok();
+        tracing::info!("Sent close frame");
     });
     tracing::info!("created shard");
 
     while let Some(item) = shard.next_event(event_types).await {
         if shutdown_time.load(Ordering::SeqCst) {
+            tracing::info!("Exiting event loop");
             break;
         }
         let Ok(event) = item else {
@@ -103,6 +108,7 @@ async fn main() {
             _event => {}
         }
     }
+    tracing::info!("Event loop done, bye!");
 }
 
 fn kickable_roles(state: &mut AppState, roles: &[Role]) {
