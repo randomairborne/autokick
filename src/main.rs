@@ -65,19 +65,19 @@ async fn main() {
     let sender = shard.sender();
     let shutdown_sender = shard.sender();
     tokio::spawn(async move {
-        tracing::info!("Awaiting shutdown signal");
+        tracing::debug!("Awaiting shutdown signal");
         vss::shutdown_signal().await;
-        tracing::info!("Got shutdown signal");
+        tracing::debug!("Got shutdown signal");
         shutdown_time_2.store(true, Ordering::SeqCst);
-        tracing::info!("Stopped event loop");
+        tracing::debug!("Stopped event loop");
         shutdown_sender.close(CloseFrame::NORMAL).ok();
-        tracing::info!("Sent close frame");
+        tracing::debug!("Sent close frame");
     });
     tracing::info!("created shard");
 
     while let Some(item) = shard.next_event(event_types).await {
         if shutdown_time.load(Ordering::SeqCst) {
-            tracing::info!("Exiting event loop");
+            tracing::debug!("Exiting event loop");
             break;
         }
         let Ok(event) = item else {
@@ -103,6 +103,11 @@ async fn main() {
             Event::MemberChunk(mc) => {
                 for member in mc.members {
                     handle_user(&state, mc.guild_id, member.user.id, &member.roles).await;
+                }
+            }
+            Event::GatewayClose(Some(gcf)) => {
+                if (4000..5000).contains(&gcf.code) {
+                    error!(reason = gcf.reason.as_ref(), "Client error in gateway loop");
                 }
             }
             _event => {}
