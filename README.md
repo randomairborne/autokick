@@ -12,6 +12,11 @@ This can provide an effective way to combat some types of selfbots, which simply
 choose the first option in onboarding, so you can have choosing the first option
 assign a role with `kick me` in the name and boom, kick them.
 
+## Set up your bot
+
+You need to make a discord bot and get its token, and
+[enable the Guild Members intent](https://discord.com/developers/docs/events/gateway#privileged-intents).
+
 ## Configuration
 
 ```shell
